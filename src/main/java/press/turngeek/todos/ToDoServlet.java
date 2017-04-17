@@ -1,11 +1,13 @@
 package press.turngeek.todos;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -18,16 +20,23 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet({ "/ToDoServlet", "/todos" })
 public class ToDoServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-    private List<ToDo> todos;
+    private ToDoService service;
+
     /**
      * @see HttpServlet#HttpServlet()
      */
     public ToDoServlet() {
         super();
-        todos=new Vector<>();
+
     }
 
-	/**
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        service = new ToDoService();
+    }
+
+    /**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -44,16 +53,20 @@ public class ToDoServlet extends HttpServlet {
 		if (todoDescr!=null&&todoDescr.length()>0) {
 			//Save button
 			//create todo
-			ToDo todo = new ToDo();
-			todo.setDescription(todoDescr);
-			todo.setCreated(new Date());
-			
-			//add todo list
-			todos.add(todo);			
-		} else {
+			ToDo todo = new ToDo(todoDescr, new Date());
+            try {
+                service.addToDo(todo);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
 			//Reset button
-			todos.clear();
-		}
+            try {
+                service.deleteAllToDos();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
 		//generate output
 		processRequest(request, response);
 	}
@@ -62,17 +75,25 @@ public class ToDoServlet extends HttpServlet {
 	private void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		response.setContentType("text/html");
 		response.setCharacterEncoding("utf-8");
-		response.getOutputStream().print(generateOutput());
+        response.getOutputStream().print(generateOutput());
 	}
 	
 	private String generateTable() {
-		StringBuffer table = new StringBuffer();
-		for (ToDo todo : todos) {
-			table.append("<tr><td>"+todo.getDescription()+"</td>");
-			table.append("<td>"+todo.getCreated()+"</td></tr>");
-		}
-		if (table.length()==0) table.append("<tr><td>Currently, there are no TODOs for you!</td></tr>");
-		return table.toString();
+        StringBuffer table = new StringBuffer();
+
+        try {
+            List<ToDo> todos = service.getAllTodos();
+
+            for (ToDo todo : todos) {
+                table.append("<tr><td>"+todo.getDescription()+"</td>");
+                table.append("<td>"+todo.getCreated()+"</td></tr>");
+            }
+            if (table.length()==0) table.append("<tr><td>Currently, there are no TODOs for you!</td></tr>");
+
+        } catch (SQLException se) {
+            table.append("Fehler beim Lesen der Datenbank");
+        }
+        return table.toString();
 	}
 	
 	private String generateOutput() {
@@ -118,5 +139,4 @@ public class ToDoServlet extends HttpServlet {
 		return site.toString();
 		
 	}
-
 }
