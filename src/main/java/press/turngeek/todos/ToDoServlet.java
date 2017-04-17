@@ -27,7 +27,6 @@ public class ToDoServlet extends HttpServlet {
      */
     public ToDoServlet() {
         super();
-
     }
 
     @Override
@@ -56,13 +55,6 @@ public class ToDoServlet extends HttpServlet {
 			ToDo todo = new ToDo(todoDescr, new Date());
             try {
                 service.addToDo(todo);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
-        } else {
-			//Reset button
-            try {
-                service.deleteAllToDos();
             } catch (SQLException e) {
                 e.printStackTrace();
             }
@@ -124,9 +116,9 @@ public class ToDoServlet extends HttpServlet {
 				"<table class=\"table table-striped\">" +
 					generateTable() +
 				"</table>" +
-				"<form role=\"form\" action=\"\">" +
+				"<form role=\"form\" method=\"POST\" action=\"delete\">" +
 					"<div class=\"form-group\">" + 
-						"<button type=\"submit\" id=\"reset\" formmethod=\"POST\" class=\"btn btn-default\">Reset</button>"+
+						"<button type=\"submit\" id=\"reset\" class=\"btn btn-default\">Reset</button>"+
 					"</div>" +
 				"</form>" +
 			"</section>" +
