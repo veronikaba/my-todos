@@ -2,6 +2,7 @@ package press.turngeek.todos;
 
 import press.turngeek.db.DBConnection;
 
+import javax.sql.DataSource;
 import java.sql.*;
 import java.sql.Date;
 import java.util.*;
@@ -10,13 +11,18 @@ public class ToDoService {
 
     Connection connection;
 
-    public ToDoService() {
-        connection = DBConnection.getDBConnection();
+    public ToDoService(DataSource ds) {
+        try {
+            connection = ds.getConnection();
+        } catch (SQLException sqle) {
+            sqle.printStackTrace();
+            throw new RuntimeException("Cannot open database connection");
+        }
     }
 
     public int addToDo(ToDo toDo) throws SQLException {
         PreparedStatement insertPreparedStatement = null;
-        String insertQuery = "INSERT INTO TODO" + "(description, created) values" + "(?,?)";
+        String insertQuery = "INSERT INTO todo" + "(description, created) values" + "(?,?)";
         int inserted = 0;
         try {
             connection.setAutoCommit(true);
@@ -36,7 +42,7 @@ public class ToDoService {
 
     public List<ToDo> getAllTodos() throws SQLException {
         Statement statement = connection.createStatement();
-        ResultSet rs = statement.executeQuery("SELECT description, created FROM TODO");
+        ResultSet rs = statement.executeQuery("SELECT description, created FROM todo");
         List<ToDo> allToDos = new ArrayList<ToDo>();
         while (rs.next()) {
             String description = rs.getString("description");
@@ -54,7 +60,7 @@ public class ToDoService {
 
     public int deleteAllToDos() throws SQLException{
         Statement statement = connection.createStatement();
-        int deleted = statement.executeUpdate("DELETE FROM TODO");
+        int deleted = statement.executeUpdate("DELETE FROM todo");
         return deleted;
     }
 }

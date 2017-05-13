@@ -1,34 +1,22 @@
 package press.turngeek.db;
 
-import press.turngeek.todos.ToDo;
+import org.h2.jdbcx.JdbcDataSource;
 
-import java.sql.*;
-import java.util.List;
+import javax.sql.DataSource;
 
 public class DBConnection {
 
     private static final String DB_DRIVER = "org.h2.Driver";
-    private static final String DB_CONNECTION = "jdbc:h2:mem:test";
+    private static final String DB_CONNECTION = "jdbc:h2:mem:todo;DB_CLOSE_DELAY=-1";
     private static final String DB_USER = "";
     private static final String DB_PASSWORD = "";
 
-    public static Connection getDBConnection() {
-        Connection dbConnection = null;
-        try {
-            Class.forName(DB_DRIVER);
-        } catch (ClassNotFoundException e) {
-            System.out.println(e.getMessage());
-        }
-        try {
-            dbConnection = DriverManager.getConnection(DB_CONNECTION, DB_USER,
-                    DB_PASSWORD);
-            Statement st = dbConnection.createStatement();
-            st.execute("create table todo(id BIGINT auto_increment, description VARCHAR(255), created DATE)");
-            st.close();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return dbConnection;
+    public static DataSource getDatasource() {
+        JdbcDataSource datasource = new JdbcDataSource();
+        datasource.setUrl(DB_CONNECTION);
+        datasource.setUser(DB_USER);
+        datasource.setPassword(DB_PASSWORD);
+        return datasource;
     }
 
 

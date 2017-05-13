@@ -1,0 +1,1 @@
+CREATE TABLE todo(id BIGINT auto_increment, description VARCHAR(255), created DATE)

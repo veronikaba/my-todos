@@ -6,6 +6,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Date;
@@ -29,7 +30,8 @@ public class DeleteToDoServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        service = new ToDoService();
+		DataSource ds = (DataSource)config.getServletContext().getAttribute("datasource");
+		service = new ToDoService(ds);
     }
 
 	/**
