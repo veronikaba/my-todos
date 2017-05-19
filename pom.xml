@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.devbookz</groupId>
     <artifactId>my-todos</artifactId>
-    <version>0.0.8-SNAPSHOT</version>
+    <version>0.0.9-SNAPSHOT</version>
     <packaging>war</packaging>
     <name>MyTODOs</name>
     <description>A Simple Web App for Managing TODOs</description>
